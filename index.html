@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MiQroForge 公开进展</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #fbfbfa;
+    --surface: #ffffff;
+    --text: #1f2328;
+    --muted: #6b7280;
+    --border: #e6e5e1;
+    --accent: #ea653d;
+    --open: #0f7b46;
+    --open-bg: #e8f5ee;
+    --merged: #6f42c1;
+    --merged-bg: #f1ebfb;
+    --closed: #6b7280;
+    --closed-bg: #f1f1ef;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17181a;
+      --surface: #1e1f22;
+      --text: #f2f2f4;
+      --muted: #a1a1aa;
+      --border: #303136;
+      --accent: #f07a52;
+      --open: #3ecf8e;
+      --open-bg: #123326;
+      --merged: #b392f0;
+      --merged-bg: #291f3d;
+      --closed: #a1a1aa;
+      --closed-bg: #2a2b2f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    line-height: 1.6;
+  }
+  main { max-width: 1040px; margin: 0 auto; padding: 48px 20px 64px; }
+  .eyebrow { margin: 0; color: var(--accent); font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+  h1 { margin: 6px 0 8px; font-size: 34px; letter-spacing: -.02em; }
+  .lede { margin: 0; color: var(--muted); }
+  .meta { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+  code { background: var(--closed-bg); border-radius: 5px; padding: 1px 5px; font-size: .92em; }
+  .filters { display: flex; gap: 8px; margin: 28px 0 8px; flex-wrap: wrap; }
+  .filters button {
+    border: 1px solid var(--border); background: var(--surface); color: var(--muted);
+    border-radius: 8px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer;
+  }
+  .filters button.active { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  section { margin-top: 28px; }
+  h2 { font-size: 18px; margin: 0 0 10px; display: flex; align-items: baseline; gap: 8px; }
+  .count { color: var(--muted); font-size: 13px; font-weight: 400; }
+  table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { font-size: 12px; color: var(--muted); font-weight: 600; background: var(--closed-bg); }
+  tr:last-child td { border-bottom: none; }
+  td.num { white-space: nowrap; color: var(--muted); font-variant-numeric: tabular-nums; }
+  td.title { font-weight: 500; min-width: 240px; }
+  td.date { white-space: nowrap; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .state { display: inline-block; border-radius: 999px; padding: 1px 9px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .state.open { color: var(--open); background: var(--open-bg); }
+  .state.merged { color: var(--merged); background: var(--merged-bg); }
+  .state.closed { color: var(--closed); background: var(--closed-bg); }
+  .chip { display: inline-block; border: 1px solid var(--border); border-radius: 999px; padding: 0 8px; margin: 1px 4px 1px 0; font-size: 12px; color: var(--muted); }
+  .muted { color: var(--muted); }
+  .empty { color: var(--muted); background: var(--surface); border: 1px dashed var(--border); border-radius: 10px; padding: 18px; margin: 0; }
+  footer { margin-top: 40px; color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">MiQroForge Desktop</p>
+    <h1>MiQroForge 公开进展</h1>
+    <p class="lede">只读快照 · 每 6 小时自动刷新 · 仅展示标记为 <code>public</code> 的 issue 与 PR</p>
+    <p class="meta">最后更新：2026-11-05 09:21 UTC</p>
+  </header>
+  <div class="filters" role="group" aria-label="按状态筛选">
+    <button type="button" data-filter="all" class="active" aria-pressed="true">全部</button>
+    <button type="button" data-filter="open" aria-pressed="false">开启</button>
+    <button type="button" data-filter="closed" aria-pressed="false">已关闭 / 已合并</button>
+  </div>
+  <section aria-labelledby="issues-heading">
+    <h2 id="issues-heading">Issues <span class="count">0</span></h2>
+    <p class="empty">还没有公开条目。给 issue 或 PR 打上 <code>public</code> 标签后，下一次刷新会出现在这里。</p>
+  </section>
+  <section aria-labelledby="pulls-heading">
+    <h2 id="pulls-heading">Pull Requests <span class="count">0</span></h2>
+    <p class="empty">还没有公开条目。给 issue 或 PR 打上 <code>public</code> 标签后，下一次刷新会出现在这里。</p>
+  </section>
+  <footer>
+    页面为静态快照，没有登录、写入或调用任何私有接口的能力。只公开编号、标题、状态、标签和更新时间。
+  </footer>
+</main>
+<script>
+(() => {
+  const buttons = Array.from(document.querySelectorAll('[data-filter]'));
+  const rows = Array.from(document.querySelectorAll('tbody tr[data-state]'));
+  const apply = (filter) => {
+    rows.forEach((row) => {
+      const state = row.dataset.state;
+      const visible = filter === 'all' || (filter === 'open' ? state === 'open' : state !== 'open');
+      row.hidden = !visible;
+    });
+    buttons.forEach((button) => {
+      const active = button.dataset.filter === filter;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+  };
+  buttons.forEach((button) => button.addEventListener('click', () => apply(button.dataset.filter)));
+})();
+</script>
+</body>
+</html>
