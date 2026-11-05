@@ -46,6 +46,8 @@
   .eyebrow { margin: 0; color: var(--accent); font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
   h1 { margin: 6px 0 8px; font-size: 34px; letter-spacing: -.02em; }
   .lede { margin: 0; color: var(--muted); }
+  .release-link { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .release-link:hover { text-decoration: underline; }
   .meta { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
   code { background: var(--closed-bg); border-radius: 5px; padding: 1px 5px; font-size: .92em; }
   .filters { display: flex; gap: 8px; margin: 28px 0 8px; flex-wrap: wrap; }
@@ -79,8 +81,8 @@
   <header>
     <p class="eyebrow">MiQroForge Desktop</p>
     <h1>MiQroForge 公开进展</h1>
-    <p class="lede">只读快照 · 每 6 小时自动刷新 · 仅展示标记为 <code>public</code> 的 issue 与 PR</p>
-    <p class="meta">最后更新：2026-11-05 09:34 UTC</p>
+    <p class="lede">只读快照 · 每 6 小时自动刷新 · 仅展示标记为 <code>public</code> 的 issue 与 PR · <a class="release-link" href="https://github.com/miqro-org/public-board/releases">下载 Release ↗</a></p>
+    <p class="meta">最后更新：2026-11-05 09:39 UTC</p>
   </header>
   <div class="filters" role="group" aria-label="按状态筛选">
     <button type="button" data-filter="all" class="active" aria-pressed="true">全部</button>
