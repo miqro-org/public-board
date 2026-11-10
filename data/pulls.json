@@ -2,10 +2,10 @@
   {
     "number": 1357,
     "title": "feat(board): 发布只读的 issue/PR 公开进展页",
-    "state": "open",
+    "state": "merged",
     "labels": [
       "public"
     ],
-    "updated_at": "2026-11-05T09:35:12Z"
+    "updated_at": "2026-11-10T05:43:16Z"
   }
 ]
