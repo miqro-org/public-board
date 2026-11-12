@@ -1,0 +1,131 @@
+name: Build Installers
+
+# 在 public-board（公开仓）里用只读 deploy key 克隆私有仓 MiQroForge-Desktop，
+# 在 GitHub Actions 上构建 Windows / macOS 全部安装包，并发布到本仓的 Release。
+# 公开仓的 Actions 分钟数不占用私有仓额度。
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: '私有仓 MiQroForge-Desktop 的分支或标签'
+        required: true
+        default: 'develop'
+      tag:
+        description: 'public-board 的 Release tag（安装包上传到该 tag）'
+        required: true
+        default: 'v0.40.0-dev'
+      prerelease:
+        description: '作为 prerelease 发布（不设为 Latest）'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-installers-${{ inputs.tag }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: build-${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: win
+          - os: macos-latest
+            target: mac
+    steps:
+      - name: Clone private repo with deploy key
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.ssh"
+          umask 077
+          printf '%s\n' "${{ secrets.PRIVATE_REPO_DEPLOY_KEY }}" > "$HOME/.ssh/private_repo"
+          chmod 600 "$HOME/.ssh/private_repo"
+          ssh-keyscan github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null
+          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/private_repo -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
+          git clone --depth 1 --branch "${{ inputs.ref }}" \
+            git@github.com:miqro-org/MiqroForge-Desktop.git private
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: private/apps/desktop/package-lock.json
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        working-directory: private
+        run: |
+          uv sync --all-extras
+          cd apps/desktop && npm ci
+
+      - name: Build Windows installers
+        if: matrix.target == 'win'
+        working-directory: private/apps/desktop
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npm run build:win
+
+      - name: Build macOS installers
+        if: matrix.target == 'mac'
+        working-directory: private/apps/desktop
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npm run build:mac
+
+      - name: Upload installers as workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: installers-${{ matrix.target }}
+          if-no-files-found: error
+          path: |
+            private/dist-new/*.exe
+            private/dist-new/*.msi
+            private/dist-new/*.zip
+            private/dist-new/*.dmg
+
+  publish:
+    name: publish-release
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Download installers
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Create or refresh public release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag }}
+          PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          set -euo pipefail
+          NOTES='公开镜像：本页仅提供安装包下载。
+          macOS：Apple Silicon（M1/M2/M3/M4）下载 arm64 的 dmg；Intel 下载不带 arm64 后缀的 dmg。'
+          if gh release view "$TAG" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            gh release edit "$TAG" --repo "${{ github.repository }}" --title "$TAG" --notes "$NOTES"
+          else
+            args=(--repo "${{ github.repository }}" --target main --title "$TAG" --notes "$NOTES")
+            if [ "$PRERELEASE" = "true" ]; then args+=(--prerelease); fi
+            gh release create "$TAG" "${args[@]}"
+          fi
+          gh release upload "$TAG" dist/* --repo "${{ github.repository }}" --clobber
