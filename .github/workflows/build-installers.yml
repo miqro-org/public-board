@@ -99,7 +99,7 @@ jobs:
             private/dist-new/*.msi
             private/dist-new/*.zip
             private/dist-new/*.dmg
-            private/dist-new/*.yml
+            private/dist-new/latest*.yml
 
   publish:
     name: publish-release
