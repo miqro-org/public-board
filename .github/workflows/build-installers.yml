@@ -113,6 +113,14 @@ jobs:
           path: dist
           merge-multiple: true
 
+      - name: Normalize update metadata asset names
+        run: |
+          set -euo pipefail
+          for f in dist/latest*.yml; do
+            [ -f "$f" ] || continue
+            sed -i 's/MiQroForge Desktop/MiQroForge.Desktop/g; s/MiQroForge.Desktop Setup /MiQroForge.Desktop.Setup./g' "$f"
+          done
+
       - name: Create or refresh public release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
